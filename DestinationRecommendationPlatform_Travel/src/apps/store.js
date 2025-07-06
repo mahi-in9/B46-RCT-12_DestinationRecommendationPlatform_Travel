@@ -1,8 +1,20 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "./authSlice";
+import authReducer from "./slices/authSlice";
+import destinationReducer from "./slices/destinationSlice";
+import preferencesReducer from "./slices/preferencesSlice";
+import surveyReducer from "./slices/surveySlice";
+import uiReducer from "./slices/uiSlice";
+import compareReducer from "./slices/compareSlice";
+import itineraryReducer from "./slices/itinerarySlice";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    destinations: destinationReducer,
+    preferences: preferencesReducer,
+    survey: surveyReducer,
+    ui: uiReducer,
+    compare: compareReducer,
+    itinerary: itineraryReducer,
   },
 });

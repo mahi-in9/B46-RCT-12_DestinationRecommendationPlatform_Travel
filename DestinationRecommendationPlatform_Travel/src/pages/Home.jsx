@@ -36,12 +36,22 @@ function Home() {
           Personalized travel recommendations based on your style, interests,
           and budget.
         </p>
-        <Link
-          to={user ? "/survey" : "/login"}
-          className="inline-block bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition"
-        >
-          {user ? "Find Your Next Destination" : "Start Your Journey"}
-        </Link>
+
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+          <Link
+            to={user ? "/survey" : "/login"}
+            className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition"
+          >
+            {user ? "Find Your Next Destination" : "Start Your Journey"}
+          </Link>
+
+          <Link
+            to="/search"
+            className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition"
+          >
+            🔍 Search Destination
+          </Link>
+        </div>
       </section>
 
       {/* Trending Section */}

@@ -1,15 +1,18 @@
+// src/apps/slices/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { auth } from "../../utills/firebase";
+import { auth, db } from "../../utills/firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  updateProfile,
 } from "firebase/auth";
+import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 
-// 🔐 Register
+// 🔐 Register and Create Firestore Profile
 export const registerUser = createAsyncThunk(
   "auth/register",
-  async ({ email, password }, { rejectWithValue }) => {
+  async ({ email, password, displayName }, { rejectWithValue }) => {
     try {
       const credentials = await createUserWithEmailAndPassword(
         auth,
@@ -17,19 +20,35 @@ export const registerUser = createAsyncThunk(
         password
       );
       const user = credentials.user;
+
+      // Optional: update auth profile
+      await updateProfile(user, { displayName });
+
+      // Create Firestore profile
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        email: user.email,
+        displayName,
+        photoURL: user.photoURL || "",
+        preferences: {},
+        favorites: [],
+        pastTrips: [],
+        createdAt: serverTimestamp(),
+      });
+
       return {
         uid: user.uid,
         email: user.email,
-        displayName: user.displayName || "",
+        displayName,
         photoURL: user.photoURL || "",
       };
     } catch (error) {
-      return rejectWithValue(error.message || "Something went wrong");
+      return rejectWithValue(error.message);
     }
   }
 );
 
-// 🔓 Login
+// 🔓 Login and Fetch Firestore Profile
 export const loginUser = createAsyncThunk(
   "auth/login",
   async ({ email, password }, { rejectWithValue }) => {
@@ -40,14 +59,15 @@ export const loginUser = createAsyncThunk(
         password
       );
       const user = credentials.user;
-      return {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName || "",
-        photoURL: user.photoURL || "",
-      };
+
+      const profileRef = doc(db, "users", user.uid);
+      const snap = await getDoc(profileRef);
+
+      if (!snap.exists()) throw new Error("No user profile found");
+
+      return snap.data();
     } catch (error) {
-      return rejectWithValue(error.message || "Something went wrong");
+      return rejectWithValue(error.message);
     }
   }
 );
@@ -60,12 +80,11 @@ export const logoutUser = createAsyncThunk(
       await signOut(auth);
       return null;
     } catch (error) {
-      return rejectWithValue(error.message || "Something went wrong");
+      return rejectWithValue(error.message);
     }
   }
 );
 
-// 🧠 Auth Slice
 const authSlice = createSlice({
   name: "auth",
   initialState: {
@@ -75,7 +94,7 @@ const authSlice = createSlice({
   },
   reducers: {
     updateUser: (state, action) => {
-      state.user = action.payload; // expects clean user object
+      state.user = action.payload;
     },
     clearUser: (state) => {
       state.user = null;
@@ -83,35 +102,32 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // 🔄 Register
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
-        state.error = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-      // 🔄 Login
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
-        state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-      // 🔄 Logout
       .addCase(logoutUser.pending, (state) => {
         state.loading = true;
       })

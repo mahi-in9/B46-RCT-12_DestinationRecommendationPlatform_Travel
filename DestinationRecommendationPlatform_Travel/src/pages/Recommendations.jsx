@@ -1,31 +1,35 @@
 import { useEffect, useState } from "react";
-import { db } from "../utills/firebase";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchRecommendations } from "../apps/slices/destinationSlice";
+import { useNavigate } from "react-router-dom";
 import {
   collection,
+  getDocs,
   query,
   where,
   orderBy,
   limit,
-  getDocs,
 } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchRecommendations } from "../apps/slices/destinationSlice";
+import { db } from "../utills/firebase";
+import DestinationCard from "./DestinationCard";
 
 function Recommendations() {
-  const { user } = useSelector((state) => state.auth);
-  const { destinations, loading } = useSelector((state) => state.destinations);
-  const [preference, setPreference] = useState(null);
-  const [prefLoading, setPrefLoading] = useState(true);
-
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  // ✅ Step 1: Fetch preferences from Firestore
+  const [latestPrefs, setLatestPrefs] = useState(null);
+  const [showRecommendations, setShowRecommendations] = useState(false);
+  const [showAll, setShowAll] = useState(false);
+  const [allDestinations, setAllDestinations] = useState([]);
+
+  const { destinations, loading, error } = useSelector(
+    (state) => state.destinations
+  );
+  const { user } = useSelector((state) => state.auth);
+
+  // ✅ Fetch latest preference (used for recommendations)
   useEffect(() => {
-    const fetchPreference = async () => {
-      if (!user) return;
-
+    const loadPreferences = async () => {
       try {
         const q = query(
           collection(db, "preferences"),
@@ -33,76 +37,99 @@ function Recommendations() {
           orderBy("createdAt", "desc"),
           limit(1)
         );
-        const snap = await getDocs(q);
-        const latestPref = snap.docs[0]?.data();
-        setPreference(latestPref);
-
-        // ✅ Step 2: After preference fetched, call redux thunk
-        if (latestPref) {
-          dispatch(fetchRecommendations(latestPref)); // { interest, style, budget }
-        }
+        const snapshot = await getDocs(q);
+        const latest = snapshot.docs[0]?.data();
+        if (latest) setLatestPrefs(latest);
       } catch (err) {
-        console.error("Error fetching preferences:", err);
-      } finally {
-        setPrefLoading(false);
+        console.error("Failed to load preferences", err);
       }
     };
 
-    fetchPreference();
-  }, [user, dispatch]);
+    if (user) loadPreferences();
+  }, [user]);
 
-  if (!user) {
-    return (
-      <div className="text-center mt-8">
-        <p className="text-lg">Please login to view recommendations.</p>
-        <button
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
-          onClick={() => navigate("/login")}
-        >
-          Go to Login
-        </button>
-      </div>
-    );
-  }
+  // ✅ Fetch all destinations for "Show All"
+  const fetchAllDestinations = async () => {
+    try {
+      const snapshot = await getDocs(collection(db, "destinations"));
+      const all = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setAllDestinations(all);
+    } catch (err) {
+      console.error("Failed to fetch all destinations", err);
+    }
+  };
 
-  if (prefLoading || loading) {
-    return <p className="text-center mt-10 text-xl">Loading...</p>;
-  }
+  // ✅ Trigger recommendations
+  const handleGetRecommendations = () => {
+    if (latestPrefs) {
+      dispatch(fetchRecommendations(latestPrefs));
+      setShowRecommendations(true);
+      setShowAll(false);
+    } else {
+      alert("No preferences found. Please complete the survey first.");
+      navigate("/survey");
+    }
+  };
+
+  // ✅ Trigger all destinations
+  const handleShowAll = () => {
+    fetchAllDestinations();
+    setShowAll(true);
+    setShowRecommendations(false);
+  };
+
+  // ✅ Decide which list to show
+  const displayList = showAll
+    ? allDestinations
+    : showRecommendations
+    ? destinations
+    : [];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <h2 className="text-3xl font-bold mb-6 text-center">
-        ✨ Your Recommendations
-      </h2>
+    <div className="max-w-6xl mx-auto p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">🎯 Recommended Destinations</h2>
+        <div className="flex gap-2">
+          <button
+            onClick={handleGetRecommendations}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+          >
+            Show Recommendations
+          </button>
+          <button
+            onClick={handleShowAll}
+            className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 transition"
+          >
+            Show All Destinations
+          </button>
+        </div>
+      </div>
 
-      {destinations.length === 0 ? (
-        <p className="text-center text-gray-600">
-          No matches found. Try changing your preferences.
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {destinations.map((dest) => (
-            <div
-              key={dest.id}
-              className="bg-white border rounded-lg shadow hover:shadow-md transition"
-            >
-              <img
-                src={dest.image}
-                alt={dest.name}
-                className="rounded-t-lg h-48 w-full object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-xl font-semibold">{dest.name}</h3>
-                <p className="text-gray-600 text-sm mt-1">{dest.description}</p>
-                <div className="mt-2 text-sm text-blue-500">
-                  <span className="mr-2">#{dest.interest}</span>
-                  <span>#{dest.style}</span>
-                </div>
-              </div>
-            </div>
-          ))}
+      {!showAll && showRecommendations && latestPrefs && (
+        <div className="mb-4 text-sm text-gray-700">
+          Showing results for: <strong>{latestPrefs.interest}</strong> |{" "}
+          <strong>{latestPrefs.style}</strong> | Budget: ₹
+          <strong>{latestPrefs.budget}</strong>
         </div>
       )}
+
+      {loading && showRecommendations && <p>Loading...</p>}
+      {error && <p className="text-red-500">Error: {error}</p>}
+      {!loading && displayList.length === 0 && (
+        <p className="text-gray-500">
+          {showAll
+            ? "No destinations available."
+            : showRecommendations
+            ? "No matching recommendations found."
+            : "Click a button above to view destinations."}
+        </p>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {displayList.map((dest) => (
+          <DestinationCard key={dest.id} dest={dest} />
+        ))}
+      </div>
     </div>
   );
 }

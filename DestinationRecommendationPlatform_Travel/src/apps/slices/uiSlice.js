@@ -4,7 +4,7 @@ const uiSlice = createSlice({
   name: "ui",
   initialState: {
     globalLoading: false,
-    theme: "light", // could be 'dark'
+    theme: "light", // 'light' | 'dark'
     showToast: {
       visible: false,
       message: "",
@@ -37,5 +37,4 @@ const uiSlice = createSlice({
 
 export const { setGlobalLoading, toggleTheme, showToast, hideToast } =
   uiSlice.actions;
-
 export default uiSlice.reducer;

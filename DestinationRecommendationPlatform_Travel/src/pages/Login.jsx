@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../apps/slices/authSlice";
 import { useNavigate } from "react-router-dom";
+import { fetchUserCards } from "../apps/slices/cardSlice";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -17,6 +18,12 @@ function Login() {
     if (!email || !password) return;
     await dispatch(loginUser({ email, password }));
   };
+
+  useEffect(() => {
+    if (user?.uid) {
+      dispatch(fetchUserCards(user.uid));
+    }
+  }, [user, dispatch]);
 
   useEffect(() => {
     if (user) {

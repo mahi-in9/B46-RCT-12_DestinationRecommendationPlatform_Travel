@@ -1,14 +1,20 @@
+// src/pages/Survey.jsx
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { db } from "../utills/firebase";
 import { addDoc, collection } from "firebase/firestore";
+import { fetchRecommendations } from "../apps/slices/destinationSlice";
+import { useEffect } from "react";
 
 function Survey() {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, watch } = useForm();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const { user } = useSelector((state) => state.auth);
 
+  // 🔁 On submit, store preferences and go to recommendations page
   const onSubmit = async (data) => {
     if (!user) {
       alert("Please log in to submit your preferences.");
@@ -22,16 +28,20 @@ function Survey() {
         uid: user.uid,
         createdAt: new Date().toISOString(),
       });
-      navigate("/recommendations");
+
+      dispatch(fetchRecommendations(data));
+      navigate("/recommendations", { state: { fromSurvey: true } });
     } catch (error) {
       console.error("Error saving preferences:", error);
       alert("Something went wrong while saving. Please try again.");
     }
   };
 
+  const budget = watch("budget", 5000); // Live budget display
+
   return (
-    <div className="max-w-xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4 text-center">
+    <div className="max-w-3xl mx-auto p-4">
+      <h2 className="text-3xl font-bold mb-6 text-center">
         🧭 Tell us your travel preferences
       </h2>
 
@@ -39,6 +49,7 @@ function Survey() {
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white p-6 rounded-lg shadow-md space-y-4"
       >
+        {/* Interest */}
         <div>
           <label className="block mb-1 font-semibold">Travel Interests:</label>
           <select
@@ -47,53 +58,57 @@ function Survey() {
           >
             <option value="">Select an interest</option>
             <option value="adventure">Adventure</option>
+            <option value="beach">Beach</option>
             <option value="culture">Culture</option>
-            <option value="relaxation">Relaxation</option>
+            <option value="history">History</option>
+            <option value="nature">Nature</option>
+            <option value="city">City</option>
+            <option value="romance">Romance</option>
+            <option value="wildlife">Wildlife</option>
           </select>
         </div>
 
+        {/* Budget */}
         <div>
-          <label className="block mb-1 font-semibold">Budget (INR):</label>
+          <label className="block mb-1 font-semibold">
+            Budget (INR): ₹{budget}
+          </label>
           <input
             type="range"
-            min="1000"
-            max="200000"
-            step="5000"
+            min="500"
+            max="10000"
+            step="100"
             className="w-full"
             {...register("budget", { required: true })}
           />
         </div>
 
+        {/* Style */}
         <div>
           <label className="block mb-1 font-semibold">Travel Style:</label>
-          <div className="flex gap-4">
-            <label>
-              <input
-                type="radio"
-                value="solo"
-                {...register("style", { required: true })}
-              />{" "}
-              Solo
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="family"
-                {...register("style", { required: true })}
-              />{" "}
-              Family
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="luxury"
-                {...register("style", { required: true })}
-              />{" "}
-              Luxury
-            </label>
+          <div className="flex flex-wrap gap-4">
+            {[
+              "solo",
+              "family",
+              "luxury",
+              "budget",
+              "adventure",
+              "relaxation",
+            ].map((style) => (
+              <label key={style} className="capitalize">
+                <input
+                  type="radio"
+                  value={style}
+                  {...register("style", { required: true })}
+                  className="mr-1"
+                />
+                {style}
+              </label>
+            ))}
           </div>
         </div>
 
+        {/* Submit */}
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"

@@ -12,14 +12,15 @@ import NavBar from "./components/common/NavBar";
 import Home from "./pages/Home";
 import Survey from "./pages/Surveys";
 import Recommendations from "./pages/Recommendations";
-import DestinationDetails from "./pages/DestinationDetails";
-import MapExplorer from "./pages/MapExplorer";
+import DestinationCard from "./pages/DestinationCard";
+import MapPage from "./pages/MapPage";
 import Compare from "./pages/Compare";
-import Itinerary from "./pages/Itinerary";
+// import Itinerary from "./pages/Itinerary";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
+import SearchDestination from "./pages/searchDestinations";
 
 function App() {
   const dispatch = useDispatch();
@@ -47,11 +48,12 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/survey" element={<Survey />} />
         <Route path="/recommendations" element={<Recommendations />} />
-        <Route path="/destination/:id" element={<DestinationDetails />} />
-        <Route path="/map" element={<MapExplorer />} />
+        <Route path="/destination/:id" element={<DestinationCard />} />
+        <Route path="/map" element={<MapPage />} />
         <Route path="/compare" element={<Compare />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/search" element={<SearchDestination />} />
         <Route
           path="/profile"
           element={
@@ -60,14 +62,14 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route
+        {/* <Route
           path="/itinerary"
           element={
             <PrivateRoute>
               <Itinerary />
             </PrivateRoute>
           }
-        />
+        /> */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

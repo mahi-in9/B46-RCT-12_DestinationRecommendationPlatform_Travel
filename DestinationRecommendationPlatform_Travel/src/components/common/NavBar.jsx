@@ -1,6 +1,7 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../apps/slices/authSlice";
+import { seedDestinations } from "../../utills/seedDestinations";
 
 function NavBar() {
   const { user } = useSelector((state) => state.auth);
@@ -14,6 +15,10 @@ function NavBar() {
   };
 
   const isActive = (path) => location.pathname === path;
+
+  const handleSeedClick = async () => {
+    await seedDestinations();
+  };
 
   return (
     <nav className="bg-amber-300 py-3 px-4 shadow-md border-b border-amber-400">
@@ -48,7 +53,9 @@ function NavBar() {
                 <Link
                   to="/recommendations"
                   className={`hover:text-blue-600 transition ${
-                    isActive("/recommendations") ? "text-blue-800 font-bold" : ""
+                    isActive("/recommendations")
+                      ? "text-blue-800 font-bold"
+                      : ""
                   }`}
                 >
                   Recommendations
@@ -66,6 +73,16 @@ function NavBar() {
               </li>
               <li>
                 <Link
+                  to="/compare"
+                  className={`hover:text-blue-600 transition ${
+                    isActive("/compare") ? "text-blue-800 font-bold" : ""
+                  }`}
+                >
+                  Compare
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/profile"
                   className={`hover:text-blue-600 transition ${
                     isActive("/profile") ? "text-blue-800 font-bold" : ""
@@ -73,6 +90,14 @@ function NavBar() {
                 >
                   Profile
                 </Link>
+              </li>
+              <li>
+                <button
+                  onClick={handleSeedClick}
+                  className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                >
+                  Add Dummy Data
+                </button>
               </li>
               <li>
                 <button

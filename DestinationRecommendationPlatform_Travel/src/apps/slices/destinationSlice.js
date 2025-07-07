@@ -1,3 +1,4 @@
+// src/apps/slices/destinationSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../utills/firebase";
@@ -5,28 +6,27 @@ import { db } from "../../utills/firebase";
 // 🔄 Async thunk to fetch recommended destinations
 export const fetchRecommendations = createAsyncThunk(
   "destinations/fetchRecommendations",
-  async ({ interest, style, budget }, { rejectWithValue }) => {
+  async (filters = {}, { rejectWithValue }) => {
     try {
-      const destRef = collection(db, "destinations");
+      const ref = collection(db, "destinations");
 
-      const q = query(
-        destRef,
-        where("interest", "==", interest),
-        where("style", "==", style)
-        // 👇 Uncomment if you have averageCost field in Firestore
-        // where("averageCost", "<=", Number(budget))
-      );
+      const conditions = [];
+      if (filters.interest) {
+        conditions.push(where("interest", "==", filters.interest));
+      }
+      if (filters.style) {
+        conditions.push(where("style", "==", filters.style));
+      }
+      if (filters.budget) {
+        conditions.push(where("averageCost", "<=", Number(filters.budget)));
+      }
 
-      const snapshot = await getDocs(q);
+      const q = conditions.length ? query(ref, ...conditions) : ref;
 
-      const results = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      return results;
+      const snap = await getDocs(q);
+      return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     } catch (error) {
-      return rejectWithValue(error.message || "Failed to fetch destinations");
+      return rejectWithValue("Failed to fetch recommendations");
     }
   }
 );
@@ -62,5 +62,4 @@ const destinationSlice = createSlice({
 });
 
 export const { clearDestinations } = destinationSlice.actions;
-
 export default destinationSlice.reducer;

@@ -6,7 +6,6 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-geosearch/dist/geosearch.css";
 
-// ✅ Fix Leaflet icon URLs for proper marker rendering
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -60,7 +59,6 @@ function MapPage() {
   useEffect(() => {
     const fetchCoordinates = async () => {
       if (!isNaN(latParam) && !isNaN(lngParam)) {
-        // ✅ Coordinates passed via URL — use them directly
         setCoords([latParam, lngParam]);
         setLoading(false);
         return;
@@ -89,7 +87,7 @@ function MapPage() {
         } catch (err) {
           console.error("Geocoding failed:", err);
           setError("Location not found. Defaulting to India.");
-          setCoords([20, 78]); // Default: India
+          setCoords([20, 78]);
         } finally {
           setLoading(false);
         }

@@ -19,7 +19,6 @@ function Profile() {
 
   const dispatch = useDispatch();
 
-  // 🔄 Fetch profile from Firestore
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user?.uid) {
@@ -53,7 +52,6 @@ function Profile() {
     fetchProfile();
   }, [user]);
 
-  // 🔁 Fetch Redux card state from Firestore (cards collection)
   useEffect(() => {
     if (user?.uid) dispatch(fetchUserCards(user.uid));
   }, [dispatch, user]);
@@ -69,7 +67,6 @@ function Profile() {
     <div className="max-w-5xl mx-auto px-4 py-6">
       <h1 className="text-3xl font-bold mb-6 text-center">👤 My Profile</h1>
 
-      {/* 🔹 User Info */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">User Information</h2>
         <p>
@@ -80,7 +77,6 @@ function Profile() {
         </p>
       </div>
 
-      {/* 🔹 Preferences */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">Saved Preferences</h2>
         {preferences?.interest ? (
@@ -100,7 +96,6 @@ function Profile() {
         )}
       </div>
 
-      {/* 🔹 Favorites from cardSlice */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">❤️ Favorite Destinations</h2>
         {favorites.length === 0 ? (
@@ -125,7 +120,6 @@ function Profile() {
         )}
       </div>
 
-      {/* 🔹 Explored */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">🌍 Explored Destinations</h2>
         {explored.length === 0 ? (
@@ -139,7 +133,6 @@ function Profile() {
         )}
       </div>
 
-      {/* 🔹 Shared */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">🔗 Shared Destinations</h2>
         {shared.length === 0 ? (
@@ -153,7 +146,6 @@ function Profile() {
         )}
       </div>
 
-      {/* 🔹 Past Trips from Firestore */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-semibold mb-4">🧳 Past Trips</h2>
         {pastTrips.length === 0 ? (

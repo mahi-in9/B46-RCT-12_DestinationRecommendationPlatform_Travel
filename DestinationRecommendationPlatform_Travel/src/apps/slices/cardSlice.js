@@ -3,7 +3,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../utills/firebase";
 
-// 🔄 Fetch user card data
 export const fetchUserCards = createAsyncThunk(
   "card/fetchUserCards",
   async (uid, { rejectWithValue }) => {
@@ -21,13 +20,11 @@ export const fetchUserCards = createAsyncThunk(
   }
 );
 
-// 🔁 Firebase sync function
 const saveToFirebase = async (uid, data) => {
   const docRef = doc(db, "cards", uid);
   await setDoc(docRef, data, { merge: true });
 };
 
-// 🔁 Helper: sync Firebase after any card update
 export const syncCardDataToFirebase = createAsyncThunk(
   "card/syncCardDataToFirebase",
   async (_, { getState, rejectWithValue }) => {
@@ -47,7 +44,7 @@ export const syncCardDataToFirebase = createAsyncThunk(
   }
 );
 
-// 🧠 Initial State
+
 const initialState = {
   favorites: [],
   explored: [],
@@ -56,7 +53,6 @@ const initialState = {
   error: null,
 };
 
-// 🧩 Slice
 const cardSlice = createSlice({
   name: "card",
   initialState,
@@ -87,7 +83,6 @@ const cardSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // 🔄 Fetch from Firebase
       .addCase(fetchUserCards.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -103,7 +98,6 @@ const cardSlice = createSlice({
         state.error = action.payload;
       })
 
-      // 🔄 Firebase sync error handling
       .addCase(syncCardDataToFirebase.rejected, (state, action) => {
         state.error = action.payload;
       });

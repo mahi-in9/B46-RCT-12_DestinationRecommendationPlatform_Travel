@@ -27,7 +27,6 @@ function Recommendations() {
   );
   const { user } = useSelector((state) => state.auth);
 
-  // ✅ Fetch latest preference (used for recommendations)
   useEffect(() => {
     const loadPreferences = async () => {
       try {
@@ -48,7 +47,6 @@ function Recommendations() {
     if (user) loadPreferences();
   }, [user]);
 
-  // ✅ Fetch all destinations for "Show All"
   const fetchAllDestinations = async () => {
     try {
       const snapshot = await getDocs(collection(db, "destinations"));
@@ -59,7 +57,6 @@ function Recommendations() {
     }
   };
 
-  // ✅ Trigger recommendations
   const handleGetRecommendations = () => {
     if (latestPrefs) {
       dispatch(fetchRecommendations(latestPrefs));
@@ -71,14 +68,12 @@ function Recommendations() {
     }
   };
 
-  // ✅ Trigger all destinations
   const handleShowAll = () => {
     fetchAllDestinations();
     setShowAll(true);
     setShowRecommendations(false);
   };
 
-  // ✅ Decide which list to show
   const displayList = showAll
     ? allDestinations
     : showRecommendations

@@ -20,7 +20,6 @@ function Register() {
 
   useEffect(() => {
     if (user) {
-      // Successful registration
       navigate("/");
     }
   }, [user, navigate]);

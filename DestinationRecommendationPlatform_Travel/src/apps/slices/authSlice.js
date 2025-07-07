@@ -9,7 +9,6 @@ import {
 } from "firebase/auth";
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 
-// 🔐 Register and Create Firestore Profile
 export const registerUser = createAsyncThunk(
   "auth/register",
   async ({ email, password, displayName }, { rejectWithValue }) => {
@@ -21,10 +20,8 @@ export const registerUser = createAsyncThunk(
       );
       const user = credentials.user;
 
-      // Optional: update auth profile
       await updateProfile(user, { displayName });
 
-      // Create Firestore profile
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         email: user.email,
@@ -48,7 +45,6 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-// 🔓 Login and Fetch Firestore Profile
 export const loginUser = createAsyncThunk(
   "auth/login",
   async ({ email, password }, { rejectWithValue }) => {
@@ -72,7 +68,7 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-// 🚪 Logout
+// Logout
 export const logoutUser = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {

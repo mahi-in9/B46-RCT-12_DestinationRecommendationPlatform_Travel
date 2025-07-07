@@ -3,7 +3,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../utills/firebase";
 
-// 🔄 Async thunk to fetch recommended destinations
 export const fetchRecommendations = createAsyncThunk(
   "destinations/fetchRecommendations",
   async (filters = {}, { rejectWithValue }) => {

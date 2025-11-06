@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import bali from "../assets/bali.png";
+import kyoto from "../assets/kyoto.png";
+import swis from "../assets/swis.png";
 
 function Home() {
   const { user } = useSelector((state) => state.auth);
@@ -8,19 +11,19 @@ function Home() {
     {
       id: 1,
       name: "Bali, Indonesia",
-      image: "https://source.unsplash.com/400x250/?bali,beach",
+      image: bali,
       description: "Tropical beaches, vibrant culture, and stunning temples.",
     },
     {
       id: 2,
       name: "Kyoto, Japan",
-      image: "https://source.unsplash.com/400x250/?kyoto,japan",
+      image: kyoto,
       description: "Historic shrines, cherry blossoms, and serene gardens.",
     },
     {
       id: 3,
       name: "Swiss Alps",
-      image: "https://source.unsplash.com/400x250/?swiss,alps",
+      image: swis,
       description: "Snowy peaks, scenic railways, and mountain adventures.",
     },
   ];

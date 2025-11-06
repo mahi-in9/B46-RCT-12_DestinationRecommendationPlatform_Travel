@@ -39,7 +39,6 @@ destination-platform/
 ├── package.json
 └── README.md
 
-
 ## 🔥 Features
 
 - 🔍 Real-time destination search
@@ -72,3 +71,22 @@ git clone https://github.com/mahi-in9/B46-RCT-12_DestinationRecommendationPlatfo
 cd DestinationRecommendationPlatform_Travel
 npm install
 npm run dev
+
+## 📸 Screenshots
+
+### 🛬 Home Page
+![Landing Page](DestinationRecommendationPlatform_Travel/screenshot/landing.png)
+
+### 📃 Survey
+
+![Survey Page](DestinationRecommendationPlatform_Travel/screenshot/survey.png)
+
+### 🔍 Search
+
+![Search Page](DestinationRecommendationPlatform_Travel/screenshot/search.png)
+
+### 🗺️ Map View
+
+![View on Map](DestinationRecommendationPlatform_Travel/screenshot/map.png)
+
+```

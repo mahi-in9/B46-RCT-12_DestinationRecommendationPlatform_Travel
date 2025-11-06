@@ -72,6 +72,8 @@ cd DestinationRecommendationPlatform_Travel
 npm install
 npm run dev
 
+```
+
 ## 📸 Screenshots
 
 ### 🛬 Home Page
@@ -89,4 +91,3 @@ npm run dev
 
 ![View on Map](DestinationRecommendationPlatform_Travel/screenshot/map.png)
 
-```

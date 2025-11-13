@@ -91,3 +91,7 @@ npm run dev
 
 ![View on Map](DestinationRecommendationPlatform_Travel/screenshot/map.png)
 
+
+## 🏷️ Tags / Topics
+`frontend` • `react` • `vite` • `tailwindcss` • `nodejs` • `firebase-auth` • `destination-recommendations` • `productivity-app` • `sustainability` • `javascript` • `webapp`  • `backend` • `vercel`
+
